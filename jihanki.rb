@@ -7,6 +7,7 @@ class VendingMachine
   def initialize
     # 最初の自動販売機に入っている金額は0円
     @slot_money = 0
+    @earned_money = 0
   end
   # 投入金額の総計を取得できる。
   def current_slot_money
@@ -31,19 +32,47 @@ class VendingMachine
   end
 
   def products
-    Juice.new("コーラ", 120, 5)
+    juice = Juice.new("コーラ", 120, 5)
+    @juice_name = juice.name
+    @juice_price = juice.price
+    @juice_stock = juice.stock
   end
-
+  def able_to_sell
+    if @slot_money >= @juice_price
+      if @juice_stock > 0
+        puts "購入可能です。"
+        return true
+      else
+        puts "在庫がありません。"
+        return false
+      end
+    else
+      puts "投入金額が不足しています。"
+      return false
+    end
+  end
+  def sell
+    if able_to_sell
+      @juice_stock -= 1
+      @earned_money += @juice_price
+      @slot_money -= @juice_price
+      puts @juice_stock
+      puts @earned_money
+    end
+  end
 end
 
 class Juice
-  attr_accessor :name, :price, :stock
+  attr_reader :name, :price, :stock
   def initialize(name, price, stock)
     @name = name
     @price = price
     @stock = stock
   end
 end
+
 vm = VendingMachine.new
 vm.products
-puts (vm.products.name)
+vm.slot_money(500)
+vm.sell
+vm.return_money
